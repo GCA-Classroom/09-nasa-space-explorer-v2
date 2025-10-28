@@ -1,3 +1,134 @@
+/* NASA Branded Styling */
+body {
+  background: linear-gradient(135deg, #23395d 60%, #42a5f5 100%);
+  color: #fff;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.site-header {
+  background: linear-gradient(90deg, #23395d 70%, #42a5f5 100%);
+  padding: 1.5em 0 1em 0;
+  text-align: center;
+  border-bottom: 4px solid #e41c24;
+}
+
+.logo {
+  width: 120px;
+  margin-bottom: 0.5em;
+}
+
+h1 {
+  font-family: 'Orbitron', 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+  text-shadow: 0 0 16px #42a5f5, 0 0 2px #fff;
+  filter: drop-shadow(0 0 16px #42a5f5);
+  color: #e41c24;
+  font-size: 2.5em;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 2em auto;
+  background: linear-gradient(120deg, rgba(66,165,245,0.15) 80%, #e3f2fd 100%);
+  border-radius: 12px;
+  box-shadow: 0 0 24px #000a  ;
+  padding: 2em 2em 3em 2em;
+}
+
+label, input, button {
+  font-size: 1em;
+}
+
+label {
+  color: #1976d2;
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+input[type="date"] {
+  background: #101c2c;
+  color: #fff;
+  border: 1px solid #1976d2;
+  border-radius: 4px;
+  padding: 0.3em 0.7em;
+  margin-right: 1em;
+}
+
+button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5em 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #1565c0;
+}
+
+#apod-gallery > div {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInCard 0.7s ease forwards;
+  animation-delay: 0.1s;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+#apod-gallery > div:hover {
+  box-shadow: 0 0 32px #42a5f5cc, 0 0 8px #fff8;
+  transform: scale(1.025) translateY(-2px);
+}
+
+@keyframes fadeInCard {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+#apod-gallery h3 {
+  color: #e41c24;
+  margin-bottom: 0.5em;
+}
+
+#apod-gallery p {
+  color: #b0c4de;
+}
+
+#apod-gallery img {
+  border: 2px solid #1976d2;
+  border-radius: 8px;
+  background: #000;
+  margin-bottom: 0.5em;
+  box-shadow: 0 0 10px #000a;
+}
+
+/* Modal Styling */
+#apod-modal {
+  background: rgba(16,28,44,0.97) !important;
+}
+#apod-modal-content {
+  background: #101c2c;
+  border-radius: 12px;
+  padding: 2em 2em 1.5em 2em;
+  box-shadow: 0 0 32px #000c;
+  max-width: 700px;
+}
+#apod-modal-title {
+  border: 2px solid #42a5f5;
+  margin-bottom: 0.7em;
+}
+#apod-modal-desc {
+  color: #b0c4de;
+  margin-top: 1.2em;
+}
+
+/* Removed invalid/duplicate CSS at-rule and selector errors */
 /* Global reset & box sizing */
 * {
   box-sizing: border-box;

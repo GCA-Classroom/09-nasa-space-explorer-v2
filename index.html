@@ -1,20 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NASA Space Explorer</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
+  <style>
+    /* Starfield background container */
+    #starfield {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: twinkle 2s infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
+
+  <div id="starfield"></div>
   <div class="container">
     <header class="site-header">
       <img src="img/nasa-worm-logo.png" alt="NASA Logo" class="logo" />
       <h1>Space Explorer</h1>
     </header>
 
-    <div class="filters">
-      <button id="getImageBtn">Fetch Space Images</button>
+    <!-- APOD Gallery Section -->
+    <div class="filters" style="margin-bottom:1em;">
+      <label for="start-date">Start Date:</label>
+      <input type="date" id="start-date" />
+      <label for="end-date">End Date:</label>
+      <input type="date" id="end-date" />
+      <button id="fetch-apod-range">Fetch Space Images</button>
+    </div>
+    <div id="apod-gallery"></div>
+    <!-- Modal for full-size image -->
+    <div id="apod-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);justify-content:center;align-items:center;flex-direction:column;">
+      <span id="apod-modal-close" style="position:absolute;top:20px;right:40px;font-size:2.5em;color:#fff;cursor:pointer;">&times;</span>
+      <div id="apod-modal-content" style="max-width:90vw;max-height:90vh;overflow:auto;text-align:center;">
+        <h2 id="apod-modal-title" style="color:#fff;"></h2>
+        <img id="apod-modal-img" src="" alt="Full Size" style="max-width:90vw;max-height:60vh;box-shadow:0 0 20px #000;display:block;margin:1em auto;" />
+        <p id="apod-modal-desc" style="color:#fff;font-size:1.1em;"></p>
+      </div>
     </div>
 
     <div id="gallery" class="gallery">
