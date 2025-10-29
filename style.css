@@ -1,3 +1,16 @@
+/* Simple, beginner-friendly styles with a NASA-like blue accent */
+
+/* Color tokens */
+:root{
+  --bg-1: #001529;
+  --bg-2: #071029;
+  --accent: #0b3d91;
+  --card-bg: rgba(255,255,255,0.03);
+  --muted: #bcd;
+  --text: #e6eefb;
+  --gap: 12px;
+}
+
 /* Global reset & box sizing */
 * {
   box-sizing: border-box;
@@ -7,47 +20,59 @@
 
 /* Base page styles */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f1f1f1;
-  padding: 20px;
+  margin: 0;
+  font-family: "Helvetica Neue", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  color: var(--text);
+
+  /* Center the page horizontally and vertically */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 36px;
 }
 
 /* Centered container */
 .container {
+  width: min(1200px, 96%);
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center; /* center header and controls */
+  padding: 18px;
 }
 
 /* Header */
 .site-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 h1 {
-  font-family: Verdana, sans-serif;
-  font-weight: bold;
-  color: #212121;
+  margin: 0;
+  font-size: 26px; /* bigger title */
+  color: var(--accent);
 }
 
 /* Logo */
 .logo {
-  width: 140px;
-  margin-right: 15px;
+  width: 72px; /* larger logo */
+  height: auto;
+  display: block;
 }
 
 /* Date‐picker & button row */
 .filters {
+  margin-bottom: 14px;
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
-  margin-bottom: 20px;
-  padding: 0 20px;
 }
 
 /* Inputs and buttons */
@@ -56,19 +81,23 @@ button {
   font-family: Arial, sans-serif;
   font-weight: normal;
   color: #666;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 10px;
+  font-size: 18px;
   line-height: 1.4;
   width: 100%;
 }
 
 /* Button specific */
 button {
-  background-color: #d3d3d3;
-  color: black;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
 }
 button:hover {
   background-color: #bfbfbf;
@@ -89,56 +118,189 @@ button:hover {
 
 /* Gallery flex container */
 .gallery {
-  display: flex;
-  flex-wrap: wrap;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); /* larger min width */
   gap: 20px;
-  padding: 20px;
-  justify-content: center;
+
+  /* ensure the grid's content is centered within the gallery area */
+  min-height: 360px;       /* give the placeholder room to center vertically */
+  align-items: center;     /* vertically center items inside each grid cell */
+  justify-items: center;   /* horizontally center items inside each grid cell */
+
+  /* center the overall grid content within the gallery box */
+  align-content: center;   /* center rows inside the available vertical space */
+  justify-content: center; /* center columns inside the available horizontal space */
+}
+
+/* Ensure placeholder itself is centered and constrained in width */
+.gallery > .placeholder {
+  /* span the entire grid so the placeholder sits centered under the header */
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-self: center;
+
+  width: min(720px, 90%);
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 /* Gallery items */
 .gallery-item {
-  flex: 1 1 100%;  /* full width by default */
-  min-width: 280px;
-  max-width: 500px;
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  overflow: hidden;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  transition: transform .12s ease, box-shadow .12s ease;
+  cursor: pointer;
+  outline: none;
 }
 
-/* Three columns on wider screens */
-@media (min-width: 1000px) {
-  .gallery-item {
-    flex: 0 1 31%;
-  }
+/* Make card media crop when image scales so rounded corners don't show overflow */
+.card {
+  overflow: hidden;
+  border-radius: 8px; /* match the image radius below */
 }
 
-.gallery-item img {
+/* Keep normal cards stretched to fill their grid cell */
+.gallery .card,
+.gallery .gallery-item {
+  justify-self: stretch;   /* allow cards to expand to full column width */
+  align-self: start;       /* keep cards aligned to the top of the cell */
+}
+
+/* Card media */
+.card img,
+.card iframe {
   width: 100%;
-  height: 200px;
+  height: 200px; /* taller preview */
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
+  background: #000;
 }
 
-.gallery-item p {
-  margin-top: 10px;
-  padding: 5px;
-  font-size: 14px;
+/* Smooth scale effect when hovering or focusing a card (keyboard accessible) */
+.card img {
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
+  display: block;
+}
+
+.card:hover img,
+.card:focus img,
+.card:active img,
+.card:focus-within img {
+  transform: scale(1.05);
 }
 
 /* Placeholder content */
 .placeholder {
-  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+
+  /* Make the placeholder fill the gallery area so its content is centered */
+  width: 100%;
+  min-height: 220px;
+
+  padding: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+
+  /* Center text inside the placeholder */
   text-align: center;
-  padding: 40px;
-  color: #666;
 }
 
 .placeholder-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
+  font-size: 40px;
+}
+
+/* Modal (created by JS) */
+.modal.hidden { display: none; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+/* overlay */
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(2,6,23,0.78);
+  backdrop-filter: blur(4px);
+}
+
+/* panel */
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, calc(100% - 40px));
+  max-height: 92vh;
+  overflow: auto;
+  padding: 22px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  box-shadow: 0 12px 40px rgba(0,0,0,0.65);
+  color: var(--text);
+}
+
+/* close button */
+.modal-close {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 26px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 6px;
+}
+
+/* media in modal */
+.modal-media {
+  display: block;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.modal-media img,
+.modal-media iframe {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  max-height: 72vh;
+  object-fit: contain;
+}
+
+/* modal text */
+.modal-panel h2 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  color: var(--accent);
+}
+.modal-panel p {
+  margin: 0 0 12px 0;
+  color: var(--text);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+/* slight responsive tweak */
+@media (max-width: 520px) {
+  .card img, .card iframe { height: 160px; }
+  .modal-panel { padding: 14px; width: calc(100% - 20px); }
 }
