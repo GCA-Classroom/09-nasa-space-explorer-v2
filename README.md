@@ -53,4 +53,22 @@ The goal is to ensure users can easily access or clearly view content regardless
 * **Fetch the JSON:** Request the CDN URL above and parse the returned array.
 * **Display the Gallery:** For each item, show the image (or video thumbnail/player), title, and date.
 
+# NASA APOD Gallery (simple)
+
+This is a beginner-friendly static web app that loads NASA's Astronomy Picture of the Day (APOD) for a user-selected date range.
+
+How to run locally (inside the dev container):
+
+1. Open a terminal in the repo root and start a simple static server:
+   - Using Python 3:
+     cd public
+     python3 -m http.server 5500
+
+2. Open the page in the host browser (the dev container exposes $BROWSER):
+   $BROWSER http://localhost:5500
+
+Notes:
+- The app uses DEMO_KEY by default. For higher rate limits, get a free API key from https://api.nasa.gov and paste it into the API Key field.
+- Keep date ranges small (a week or two) to avoid large downloads and rate limits.
+
 

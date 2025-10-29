@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astronomy Picture of the Day Gallery</title>
+    <link rel="stylesheet" href="styles/main.css"> <!-- Link to the main CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Astronomy Picture of the Day Gallery</h1> <!-- Main title of the application -->
+        <p>Select a date range to view the Astronomy Pictures of the Day.</p>
+        <label for="start-date">Start Date:</label>
+        <input type="date" id="start-date"> <!-- Input for start date -->
+        <label for="end-date">End Date:</label>
+        <input type="date" id="end-date"> <!-- Input for end date -->
+        <button id="fetch-images">Fetch Images</button> <!-- Button to fetch images -->
+    </header>
+    <main>
+        <div id="gallery" class="gallery"> <!-- Container for the image gallery -->
+            <!-- Images will be dynamically inserted here -->
+        </div>
+    </main>
+    <script src="../src/app.js"></script> <!-- Link to the main JavaScript file -->
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NASA APOD Gallery</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>NASA Astronomy Picture of the Day - Gallery</h1>
+
+    <!-- Controls: single button to fetch the provided JSON feed -->
+    <section class="controls">
+      <button id="fetchBtn">Get Space Images</button>
+    </section>
+
+    <!-- Status messages -->
+    <div id="status" class="status"></div>
+
+    <!-- Gallery -->
+    <section id="gallery" class="gallery"></section>
+  </main>
+
+  <!-- Modal: hidden by default, populated and shown via JS -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" data-close></div>
+
+    <div class="modal-panel" role="document">
+      <button id="modalClose" class="modal-close" aria-label="Close">×</button>
+
+      <div class="modal-media" id="modalMedia"><!-- image or iframe injected --></div>
+
+      <div class="modal-body">
+        <h2 id="modalTitle"></h2>
+        <p id="modalDate" class="meta"></p>
+        <p id="modalExplanation"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>
