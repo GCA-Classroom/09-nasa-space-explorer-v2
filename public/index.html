@@ -10,9 +10,20 @@
   <main class="container">
     <h1>NASA Astronomy Picture of the Day - Gallery</h1>
 
-    <!-- Controls: single button to fetch the provided JSON feed -->
+    <!-- Controls: start date, API key (optional), and fetch button -->
     <section class="controls">
-      <button id="fetchBtn">Get Space Images</button>
+  <label for="startDate">Start Date:</label>
+  <input id="startDate" type="date" aria-label="Start date for range" />
+
+  <label for="endDate">End Date:</label>
+  <input id="endDate" type="date" aria-label="End date for range" />
+
+      <label for="apiKey">API Key:</label>
+      <input id="apiKey" type="text" placeholder="DEMO_KEY or your NASA API key" aria-label="NASA API key (optional)" />
+
+      <button id="fetchBtn">Get 9-Day Range / Classroom Feed</button>
+
+      <p style="font-size:0.9rem;color:rgba(255,255,255,0.7);">Tip: pick a start date to fetch 9 consecutive days. Leave API key blank to use DEMO_KEY.</p>
     </section>
 
     <!-- Status messages -->
