@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   
-  // API KEY PROVIDED BY USER (Now integrated)
+  // CLAVE API PROPORCIONADA POR EL USUARIO
   const API_KEY = "pHkUcOcgcv4qGCmizdVlKDxwJ9i6siVfesiGqXHq"; 
-  // Base URL for the APOD API. We will add start_date and end_date dynamically.
   const DATA_BASE_URL = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`; 
 
   const form = document.getElementById("date-form");
@@ -10,8 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const results = document.getElementById("results");
   const message = document.getElementById("message");
   const didYouKnowEl = document.getElementById("did-you-know");
+  
+  // NUEVO: Referencia al elemento de carga
+  const loadingSpinner = document.getElementById("loading-spinner");
 
-  // Modal elements
+  // Modal elements (Omitidos para brevedad)
   const modal = document.getElementById("media-modal");
   const modalBackdrop = document.getElementById("modal-backdrop");
   const modalClose = document.getElementById("modal-close");
@@ -29,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "In 1977 the Voyager probes were launched; they still send data from deep space."
   ];
 
-  // Show a random fact
   (function showRandomDidYouKnow() {
     const idx = Math.floor(Math.random() * DID_YOU_KNOW.length);
     if (didYouKnowEl) didYouKnowEl.textContent = `Did you know? ${DID_YOU_KNOW[idx]}`;
@@ -39,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function formatDate(d) { return d.toISOString().slice(0,10); }
 
-  // Calculates the end date 8 days after the start date for a 9-day range
   function getEndDate(startDateObj) {
       const cur = new Date(startDateObj);
       cur.setDate(cur.getDate() + 8); 
@@ -48,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   function showMessage(text) { if (message) message.textContent = text; }
   
-  // Renders the array of data received from the API
   function renderNineDays(data) {
       results.innerHTML = "";
       let renderedCount = 0;
@@ -70,35 +69,42 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => { if (message && message.textContent.includes("Showing")) message.textContent = ""; }, 3000);
   }
   
-  // --- CORE LOGIC ---
+  // --- CORE LOGIC: FETCHING DATA ---
 
-  // Fetches data for the specific 9-day range from the NASA API
   async function fetchAndRenderNineDays(startDate) {
       results.innerHTML = "";
       showMessage(`Fetching data from NASA for 9 days starting ${startDate}...`);
       
       const startDateObj = new Date(startDate);
       const endDate = getEndDate(startDateObj);
-      
-      // Construct the API URL with the start_date and end_date parameters
       const FULL_URL = `${DATA_BASE_URL}&start_date=${startDate}&end_date=${endDate}`;
       
+      // MOSTRAR EL SPINNER ANTES DE EMPEZAR
+      loadingSpinner.style.display = "block";
+
       try {
           const resp = await fetch(FULL_URL);
-          if (!resp.ok) throw new Error(`Network error ${resp.status}. Check API Key/Date.`);
+          if (!resp.ok) {
+            console.error(`API Request Failed with Status: ${resp.status}`);
+            throw new Error(`Network error ${resp.status}. Check API Key and date range constraints.`);
+          }
           
           const data = await resp.json();
           const arr = Array.isArray(data) ? data : []; 
+          
+          arr.sort((a, b) => new Date(a.date) - new Date(b.date));
           
           renderNineDays(arr); 
 
       } catch (err) {
           console.error("Failed to load data:", err);
-          showMessage(`Failed to load data. Error: ${err.message}.`);
+          showMessage(`Failed to load data. Error: ${err.message}. Please check the console (F12) for details.`);
+      } finally {
+          // OCULTAR EL SPINNER SIEMPRE QUE TERMINE
+          loadingSpinner.style.display = "none";
       }
   }
 
-  // Initial load message
   function loadFeed() {
     showMessage("Enter a start date (YYYY-MM-DD) and click 'Show 9 Days' to load images.");
   }
@@ -117,17 +123,15 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const startDateObj = new Date(rawStart);
     const today = new Date();
-    // Validate date is not in the future
     if (startDateObj > today) { 
         showMessage("Start date cannot be in the future."); 
         return; 
     }
 
-    // Call the dynamic fetching function
     fetchAndRenderNineDays(rawStart);
   });
 
-  // --- CARD & MODAL LOGIC (Your original robust code) ---
+  // --- CARD & MODAL LOGIC (UNCHANGED) ---
   
   function createCard(item) {
     const card = document.createElement("article");
