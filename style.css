@@ -1,1 +1,13 @@
-
+/* Estilos para el Mensaje de Carga */
+.loading-message {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2em;
+    color: #58a6ff;
+    background-color: #161b22;
+    border: 2px solid #58a6ff;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-weight: bold;
+    /* Puedes añadir una animación CSS aquí si quieres un spinner más avanzado */
+}
