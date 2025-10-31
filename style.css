@@ -270,16 +270,19 @@ body.modal-open {
 
 /* Loading / placeholder */
 .placeholder {
-  padding: 1rem; /* reduced from 2rem to bring emoji closer to the button */
+  padding: 1rem; /* compact padding */
   text-align: center;
-  color: #000; /* changed to black */
+  color: #000;
 }
 
-/* Placeholder icon (emoji) — larger and spaced from the text */
-.placeholder-icon {
-  display: block;        /* ensure it sits above the paragraph */
-  font-size: 48px;       /* make the emoji larger */
-  line-height: 1;        /* avoid extra vertical gaps */
-  margin-bottom: 0.5rem; /* reduced spacing between emoji and caption */
+/* Random fact — centered and constrained */
+.random-fact {
   text-align: center;
+  max-width: 900px;
+  margin: 0.75rem auto; /* center and add some breathing room */
+  padding: 0.5rem 1rem;
+  color: #07142a;
+  background: rgba(11,37,69,0.05);
+  border-radius: 6px;
+  font-weight: 500;
 }
