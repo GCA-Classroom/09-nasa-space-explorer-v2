@@ -181,6 +181,16 @@ button:focus {
   width: 100%;
   height: 160px;
   object-fit: cover;
+  /* Hover zoom: smooth transform for a subtle scale effect */
+  transition: transform 250ms cubic-bezier(.2,.8,.2,1);
+  transform-origin: center;
+  will-change: transform;
+}
+
+/* Scale the image slightly when the card is hovered or focused */
+.card:hover .media img,
+.card:focus .media img {
+  transform: scale(1.06);
 }
 
 .card-body {
