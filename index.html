@@ -1,54 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA APOD - 9 Days</title>
-    <link rel="stylesheet" href="style.css"> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NASA Space Explorer</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <img src="img/NASA-Logo-Large.jpg" alt="NASA Logo" class="nasa-logo">
-            <h1>Astronomy Picture of the Day (APOD)</h1>
-        </div>
-    </header>
+  <header>
+    <div class="logos">
+      <img src="img/NASA-Logo-Large.jpg" alt="NASA logo" class="logo main-logo">
+      <img src="img/nasa-worm-logo.png" alt="NASA Worm logo" class="logo worm-logo">
+    </div>
+    <h1>NASA Space Explorer</h1>
+  </header>
 
-    <main class="container">
-        
-        <form id="date-form">
-            <label for="start-date">Select a Start Date (Will fetch 9 days from that date):</label>
-            <input type="date" id="start-date" required>
-            <button type="submit">Show 9 Days</button>
-        </form>
+  <main>
+    <section class="controls">
+      <label for="startDate">Select a start date:</label>
+      <input type="date" id="startDate">
+      <button id="fetchBtn">Show 9 Days of Space</button>
+      <p class="note">* The gallery will show 9 consecutive days after the selected date.</p>
+    </section>
 
-        <div id="message" class="info-message">Enter a start date (YYYY-MM-DD) and click 'Show 9 Days' to load images.</div>
-        <div id="did-you-know" class="fact"></div>
+    <section id="gallery" class="gallery"></section>
+  </main>
 
-        <hr>
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeModal">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <p id="modalDate"></p>
+      <img id="modalImg" alt="NASA photo">
+      <p id="modalExplanation"></p>
+    </div>
+  </div>
 
-        <h2>Results:</h2>
-        
-        <div id="loading-spinner" class="loading-message" style="display:none;">
-            🚀 Fetching images from space... Please wait.
-        </div>
-        
-        <section id="results" class="gallery-grid">
-            </section>
+  <footer>
+    <p>Powered by NASA Open APIs — Astronomy Picture of the Day</p>
+  </footer>
 
-        <div id="modal-backdrop" class="modal-backdrop"></div>
-        <div id="media-modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
-            <div class="modal-content">
-                <button id="modal-close" class="modal-close-btn">&times;</button>
-                <div id="modal-media" class="modal-media-content"></div>
-                <h3 id="modal-title"></h3>
-                <div id="modal-date"></div>
-                <p id="modal-explain"></p>
-            </div>
-        </div>
-
-    </main>
-
-    <script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
