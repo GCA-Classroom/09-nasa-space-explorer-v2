@@ -274,3 +274,12 @@ body.modal-open {
   text-align: center;
   color: #000; /* changed to black */
 }
+
+/* Placeholder icon (emoji) — larger and spaced from the text */
+.placeholder-icon {
+  display: block;        /* ensure it sits above the paragraph */
+  font-size: 48px;       /* make the emoji larger */
+  line-height: 1;        /* avoid extra vertical gaps */
+  margin-bottom: 0.75rem;/* space between emoji and caption */
+  text-align: center;
+}
