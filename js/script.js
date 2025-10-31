@@ -13,7 +13,7 @@ const gallery = document.getElementById('gallery');
 const modal = document.getElementById('modal');
 const modalBackdrop = document.getElementById('modalBackdrop');
 const modalClose = document.getElementById('modalClose');
-const modalImage = document.getElementById('modalImage');
+const modalMedia = document.querySelector('.modal-media');
 const modalTitle = document.getElementById('modalTitle');
 const modalDate = document.getElementById('modalDate');
 const modalExplanation = document.getElementById('modalExplanation');
@@ -21,25 +21,75 @@ const modalExplanation = document.getElementById('modalExplanation');
 // Keep the fetched items so clicks on cards can show details in the modal
 let apodItems = [];
 
-// Helper: show a simple message in the gallery area (loading, errors, etc.)
+/* Helper: show a simple message in the gallery area (loading, errors, etc.) */
 function showMessage(text) {
   gallery.innerHTML = `<div class="placeholder"><p>${text}</p></div>`;
 }
 
-// Helper: create HTML for a single APOD item (image or video)
-// Each card includes data-index so we can open the correct item in the modal.
+/* Helper: if the APOD 'url' contains iframe HTML, extract its src attribute */
+function extractIframeSrc(maybeHtml) {
+  if (!maybeHtml || typeof maybeHtml !== 'string') return null;
+  const m = maybeHtml.match(/<iframe[^>]*\s+src=(?:'|")([^'"]+)(?:'|")[^>]*>/i);
+  return m ? m[1] : null;
+}
+
+/* Helper: extract YouTube video id from common URL formats (also accepts iframe src) */
+function getYouTubeId(url) {
+  if (!url) return null;
+  // if it's iframe/html, pull src first
+  const src = extractIframeSrc(url) || url;
+  // normalize: remove query string / params
+  const clean = src.split(/[?#&]/)[0];
+
+  // match common YouTube patterns (youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...)
+  const ytMatch = clean.match(
+    /(?:youtube\.com\/(?:watch\/?\?v=|watch\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})$/
+  );
+  return ytMatch ? ytMatch[1] : null;
+}
+
+/* Helper: build thumbnail URL for a video item when possible */
+function videoThumbnailFor(item) {
+  // prefer explicit thumbnail_url if provided
+  if (item.thumbnail_url) return item.thumbnail_url;
+
+  // try to use any iframe src inside item.url
+  const src = extractIframeSrc(item.url) || item.url;
+  const id = getYouTubeId(src);
+  if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+
+  return null;
+}
+
+/* Helper: create HTML for a single APOD item (image or video)
+   Each card includes data-index so we can open the correct item in the modal. */
 function createCard(item, index) {
   const title = item.title || 'Untitled';
   const date = item.date || '';
-  const thumb = item.url || '';
   let mediaHtml = '';
 
-  // Show an img thumbnail for image media; videos get a placeholder thumbnail (or skip)
-  if (item.media_type === 'image' && thumb) {
-    mediaHtml = `<img src="${thumb}" alt="${title}" loading="lazy">`;
-  } else if (item.media_type === 'video' && item.thumbnail_url) {
-    // If a thumbnail_url is available, use it (some datasets include it)
-    mediaHtml = `<img src="${item.thumbnail_url}" alt="${title}" loading="lazy">`;
+  // If the item is an image, show a thumbnail image
+  if (item.media_type === 'image' && item.url) {
+    mediaHtml = `<img src="${item.url}" alt="${title}" loading="lazy">`;
+  } else if (item.media_type === 'video') {
+    // For videos: try to show a thumbnail (YouTube or provided). Add a play overlay.
+    const thumb = videoThumbnailFor(item);
+    if (thumb) {
+      mediaHtml = `
+        <div class="video-thumb-wrap">
+          <img src="${thumb}" alt="${title}" loading="lazy">
+          <div class="play-overlay" aria-hidden="true">▶</div>
+        </div>
+      `;
+    } else {
+      // Fallback: clear video placeholder
+      mediaHtml = `
+        <div class="no-media">
+          <div class="play-overlay small" aria-hidden="true">▶</div>
+          <div class="no-media-text">Video — click to open</div>
+        </div>
+      `;
+    }
   } else {
     mediaHtml = `<div class="no-media">Media not available</div>`;
   }
@@ -56,7 +106,7 @@ function createCard(item, index) {
   `;
 }
 
-// Render the gallery from an array of items
+/* Render the gallery from an array of items */
 function renderGallery(items) {
   if (!Array.isArray(items) || items.length === 0) {
     showMessage('No images found in the data.');
@@ -66,99 +116,60 @@ function renderGallery(items) {
   // Save items for modal lookups
   apodItems = items;
 
-  // Build cards (show up to 12 for beginners)
-  const itemsToShow = items.slice(0, 12);
+  // Build cards — show up to 9 items so we get a 3x3 grid (three rows of three)
+  const itemsToShow = items.slice(0, 9);
   const cardsHtml = itemsToShow.map((it, i) => createCard(it, i)).join('');
   gallery.innerHTML = `<div class="cards">${cardsHtml}</div>`;
 }
 
-// Open modal for a specific item index
+/* Open modal for a specific item index
+   Handle images and videos appropriately:
+   - images: show a larger image
+   - videos: embed an iframe if possible (YouTube or other iframe src), otherwise show thumbnail + link */
 function openModal(index) {
   const item = apodItems[index];
   if (!item) return;
 
-  // Larger image — for images use url; for video show a poster if available
+  // Clear previous media
+  modalMedia.innerHTML = '';
+
   if (item.media_type === 'image') {
-    modalImage.src = item.hdurl || item.url || '';
-    modalImage.alt = item.title || 'Space image';
-    modalImage.style.display = ''; // ensure visible
-  } else {
-    // For videos, we prefer to show the provided URL in an iframe.
-    // For simplicity in this beginner example, show the thumbnail if no direct embed is used.
-    modalImage.src = item.thumbnail_url || item.url || '';
-    modalImage.alt = item.title || 'Space media';
-  }
+    // Create an <img> element for larger image
+    const img = document.createElement('img');
+    img.src = item.hdurl || item.url || '';
+    img.alt = item.title || 'Space image';
+    img.loading = 'lazy';
+    modalMedia.appendChild(img);
+  } else if (item.media_type === 'video') {
+    // First, try to extract any iframe src from the data
+    const embeddedSrc = extractIframeSrc(item.url);
+    const sourceToUse = embeddedSrc || item.url || '';
 
-  modalTitle.textContent = item.title || '';
-  modalDate.textContent = item.date || '';
-  modalExplanation.textContent = item.explanation || '';
-
-  modal.setAttribute('aria-hidden', 'false');
-  modal.classList.add('open');
-  document.body.classList.add('modal-open');
-}
-
-// Close the modal and clear media to stop playback where applicable
-function closeModal() {
-  modal.setAttribute('aria-hidden', 'true');
-  modal.classList.remove('open');
-  document.body.classList.remove('modal-open');
-
-  // Clear image src to stop network activity / video playback
-  modalImage.src = '';
-  modalExplanation.textContent = '';
-}
-
-// Fetch data from the JSON file and render the gallery
-async function fetchApodData() {
-  try {
-    // Show a clear loading message while data downloads
-    showMessage('🔄 Loading space photos…');
-
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error(`Network response was not ok (${response.status})`);
-    }
-
-    const data = await response.json();
-
-    // The API will return a set of objects that include image URLs, titles, dates, and explanations.
-    // Use that data to populate the gallery.
-    renderGallery(data);
-  } catch (error) {
-    console.error('Fetch error:', error);
-    showMessage('Sorry, something went wrong while fetching images.');
-  }
-}
-
-// Event: click on the "Get Space Images" button
-getImageBtn.addEventListener('click', () => {
-  fetchApodData();
-});
-
-// Event delegation: open modal when a card is clicked or activated via keyboard
-gallery.addEventListener('click', (e) => {
-  const card = e.target.closest('.card');
-  if (!card) return;
-  const idx = Number(card.getAttribute('data-index'));
-  openModal(idx);
-});
-
-gallery.addEventListener('keydown', (e) => {
-  // open on Enter or Space when a card is focused
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.card')) {
-    e.preventDefault();
-    const card = e.target.closest('.card');
-    const idx = Number(card.getAttribute('data-index'));
-    openModal(idx);
-  }
-});
-
-// Modal UI events: backdrop, close button, and Escape key
-modalBackdrop.addEventListener('click', closeModal);
-modalClose.addEventListener('click', closeModal);
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modal.classList.contains('open')) {
-    closeModal();
-  }
-});
+    // Try to detect YouTube and embed as player
+    const ytId = getYouTubeId(sourceToUse);
+    if (ytId) {
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute('src', `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`);
+      iframe.setAttribute('width', '100%');
+      iframe.setAttribute('height', '500');
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.title = item.title || 'Video';
+      modalMedia.appendChild(iframe);
+    } else if (sourceToUse && (sourceToUse.startsWith('http://') || sourceToUse.startsWith('https://'))) {
+      // If the data already contains a usable embed src (non-YouTube), embed it directly.
+      // If it's just a page link, show thumbnail (if available) and provide a clear link.
+      if (sourceToUse.includes('iframe') || sourceToUse.includes('embed')) {
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('src', sourceToUse);
+        iframe.setAttribute('width', '100%');
+        iframe.setAttribute('height', '500');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.title = item.title || 'Video';
+        modalMedia.appendChild(iframe);
+      } else {
+        const thumb = videoThumbnailFor(item);
+        if
