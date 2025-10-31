@@ -279,7 +279,7 @@ body.modal-open {
 .random-fact {
   text-align: center;
   max-width: 900px;
-  margin: 0.75rem auto; /* center and add some breathing room */
+  margin: 1.5rem auto 0.75rem; /* add top spacing so it's nicely separated from the button */
   padding: 0.5rem 1rem;
   color: #07142a;
   background: rgba(11,37,69,0.05);
