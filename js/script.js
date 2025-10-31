@@ -66,8 +66,8 @@ function renderGallery(items) {
   // Save items for modal lookups
   apodItems = items;
 
-  // Build cards — show up to 9 items so we get a 3x3 grid (three rows of three)
-  const itemsToShow = items.slice(0, 9); // <- changed from 12 to 9
+  // Build cards (show up to 12 for beginners)
+  const itemsToShow = items.slice(0, 12);
   const cardsHtml = itemsToShow.map((it, i) => createCard(it, i)).join('');
   gallery.innerHTML = `<div class="cards">${cardsHtml}</div>`;
 }
