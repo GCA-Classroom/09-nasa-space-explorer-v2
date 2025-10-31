@@ -36,14 +36,14 @@ function extractIframeSrc(maybeHtml) {
 /* Helper: extract YouTube video id from common URL formats (also accepts iframe src) */
 function getYouTubeId(url) {
   if (!url) return null;
-  // if it's iframe/html, pull src first
+  // if url contains iframe HTML, pull src first
   const src = extractIframeSrc(url) || url;
-  // normalize: remove query string / params
+  // remove query string / params to make matching simpler
   const clean = src.split(/[?#&]/)[0];
 
-  // match common YouTube patterns (youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...)
+  // match common YouTube patterns (watch?v=..., youtu.be/..., embed/...)
   const ytMatch = clean.match(
-    /(?:youtube\.com\/(?:watch\/?\?v=|watch\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})$/
+    /(?:youtube\.com\/(?:watch(?:\/?\?v=)?|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
   );
   return ytMatch ? ytMatch[1] : null;
 }
@@ -52,12 +52,9 @@ function getYouTubeId(url) {
 function videoThumbnailFor(item) {
   // prefer explicit thumbnail_url if provided
   if (item.thumbnail_url) return item.thumbnail_url;
-
-  // try to use any iframe src inside item.url
-  const src = extractIframeSrc(item.url) || item.url;
-  const id = getYouTubeId(src);
+  // try YouTube thumbnail
+  const id = getYouTubeId(item.url);
   if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-
   return null;
 }
 
@@ -125,7 +122,7 @@ function renderGallery(items) {
 /* Open modal for a specific item index
    Handle images and videos appropriately:
    - images: show a larger image
-   - videos: embed an iframe if possible (YouTube or other iframe src), otherwise show thumbnail + link */
+   - videos: embed an iframe if possible (YouTube), otherwise show thumbnail + link */
 function openModal(index) {
   const item = apodItems[index];
   if (!item) return;
@@ -141,35 +138,37 @@ function openModal(index) {
     img.loading = 'lazy';
     modalMedia.appendChild(img);
   } else if (item.media_type === 'video') {
-    // First, try to extract any iframe src from the data
-    const embeddedSrc = extractIframeSrc(item.url);
-    const sourceToUse = embeddedSrc || item.url || '';
+    // Try to extract any iframe src from the data (some APOD entries include full iframe HTML)
+    const embeddedSrc = extractIframeSrc(item.url) || item.url || '';
 
     // Try to detect YouTube and embed as player
-    const ytId = getYouTubeId(sourceToUse);
+    const ytId = getYouTubeId(embeddedSrc);
     if (ytId) {
       const iframe = document.createElement('iframe');
       iframe.setAttribute('src', `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`);
       iframe.setAttribute('width', '100%');
       iframe.setAttribute('height', '500');
       iframe.setAttribute('frameborder', '0');
-      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      // include autoplay and encrypted-media so playback works where allowed
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
       iframe.setAttribute('allowfullscreen', '');
       iframe.title = item.title || 'Video';
+      iframe.style.border = '0';
       modalMedia.appendChild(iframe);
-    } else if (sourceToUse && (sourceToUse.startsWith('http://') || sourceToUse.startsWith('https://'))) {
-      // If the data already contains a usable embed src (non-YouTube), embed it directly.
-      // If it's just a page link, show thumbnail (if available) and provide a clear link.
-      if (sourceToUse.includes('iframe') || sourceToUse.includes('embed')) {
+    } else if (embeddedSrc && (embeddedSrc.startsWith('http://') || embeddedSrc.startsWith('https://'))) {
+      // If embeddedSrc looks like a direct embed URL (non-YouTube) try embedding it
+      if (embeddedSrc.includes('/embed/') || embeddedSrc.includes('iframe')) {
         const iframe = document.createElement('iframe');
-        iframe.setAttribute('src', sourceToUse);
+        iframe.setAttribute('src', embeddedSrc);
         iframe.setAttribute('width', '100%');
         iframe.setAttribute('height', '500');
         iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
         iframe.setAttribute('allowfullscreen', '');
         iframe.title = item.title || 'Video';
+        iframe.style.border = '0';
         modalMedia.appendChild(iframe);
       } else {
+        // fallback: show thumbnail (if any) and provide a clear link to open the video
         const thumb = videoThumbnailFor(item);
         if
