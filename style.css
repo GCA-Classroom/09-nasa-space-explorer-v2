@@ -46,7 +46,7 @@ h1 {
   flex-direction: column;
   gap: 10px;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 8px; /* reduced from 20px to bring button closer to the gallery */
   padding: 0 20px;
 }
 
@@ -100,7 +100,7 @@ button:focus {
    Use block layout so the inner .cards grid can control columns reliably. */
 .gallery {
   display: block; /* changed from flex to block so .cards grid works properly */
-  padding: 20px;
+  padding: 8px 20px; /* reduced top padding to tighten the gap */
 }
 
 /* Gallery items */
@@ -270,7 +270,7 @@ body.modal-open {
 
 /* Loading / placeholder */
 .placeholder {
-  padding: 2rem;
+  padding: 1rem; /* reduced from 2rem to bring emoji closer to the button */
   text-align: center;
   color: #000; /* changed to black */
 }
@@ -280,6 +280,6 @@ body.modal-open {
   display: block;        /* ensure it sits above the paragraph */
   font-size: 48px;       /* make the emoji larger */
   line-height: 1;        /* avoid extra vertical gaps */
-  margin-bottom: 0.75rem;/* space between emoji and caption */
+  margin-bottom: 0.5rem; /* reduced spacing between emoji and caption */
   text-align: center;
 }
