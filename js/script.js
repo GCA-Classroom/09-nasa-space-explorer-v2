@@ -156,7 +156,8 @@ function renderGallery(items) {
 /* Open modal for a specific item index
    Handle images and videos appropriately:
    - images: show a larger image
-   - videos: embed an iframe if possible (YouTube), otherwise show thumbnail + link */
+   - videos: embed an iframe if possible (YouTube), otherwise show thumbnail + link
+   This special-case embeds the exact iframe markup you provided for the video id 1R5QqhPq1Ik. */
 function openModal(index) {
   const item = apodItems[index];
   if (!item) return;
@@ -174,55 +175,74 @@ function openModal(index) {
   } else if (item.media_type === 'video') {
     // Try to extract any iframe src from the data (some APOD entries include full iframe HTML)
     const embeddedSrc = extractIframeSrc(item.url) || item.url || '';
-
-    // Try to detect YouTube and embed as player
     const ytId = getYouTubeId(embeddedSrc);
-    if (ytId) {
+
+    // If this is the exact video you want, insert the provided iframe markup so it plays with the exact params
+    if (ytId === '1R5QqhPq1Ik') {
+      modalMedia.innerHTML = `
+        <div class="video-embed-wrap">
+          <iframe width="560" height="315"
+            src="https://www.youtube.com/embed/1R5QqhPq1Ik?si=mfXXB1kdtjW50Nji&autoplay=1"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen>
+          </iframe>
+        </div>
+      `;
+    } else if (ytId) {
+      // Generic YouTube embed for other videos
       const iframe = document.createElement('iframe');
-      iframe.setAttribute('src', `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`);
+      iframe.setAttribute('src', `https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1&autoplay=1`);
       iframe.setAttribute('width', '100%');
       iframe.setAttribute('height', '500');
       iframe.setAttribute('frameborder', '0');
-      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
       iframe.setAttribute('allowfullscreen', '');
       iframe.title = item.title || 'Video';
       iframe.style.border = '0';
       modalMedia.appendChild(iframe);
     } else if (embeddedSrc && (embeddedSrc.startsWith('http://') || embeddedSrc.startsWith('https://'))) {
-      // If embeddedSrc looks like a direct embed URL (non-YouTube) try embedding it
-      if (embeddedSrc.includes('/embed/') || embeddedSrc.includes('youtube.com') || embeddedSrc.includes('vimeo.com')) {
-        const iframe = document.createElement('iframe');
-        iframe.setAttribute('src', embeddedSrc);
-        iframe.setAttribute('width', '100%');
-        iframe.setAttribute('height', '500');
-        iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-        iframe.setAttribute('allowfullscreen', '');
-        iframe.title = item.title || 'Video';
-        iframe.style.border = '0';
-        modalMedia.appendChild(iframe);
-      } else {
-        // fallback: show thumbnail (if any) and provide a clear link to open the video
-        const thumb = videoThumbnailFor(item);
-        if (thumb) {
-          const img = document.createElement('img');
-          img.src = thumb;
-          img.alt = item.title || 'Video thumbnail';
-          img.loading = 'lazy';
-          modalMedia.appendChild(img);
-        }
+      // Generic iframe embed for other video sources
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute('src', embeddedSrc);
+      iframe.setAttribute('width', '100%');
+      iframe.setAttribute('height', '500');
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.title = item.title || 'Video';
+      iframe.style.border = '0';
+      modalMedia.appendChild(iframe);
+
+      // Fallback link in case embedding is blocked
+      const fallback = document.createElement('div');
+      fallback.style.marginTop = '0.75rem';
+      fallback.innerHTML = `<a href="${embeddedSrc}" target="_blank" rel="noopener">Open video in a new tab</a>`;
+      modalMedia.appendChild(fallback);
+    } else {
+      // No usable embed; show thumbnail (if any) and provide a link
+      const thumb = videoThumbnailFor(item);
+      if (thumb) {
+        const img = document.createElement('img');
+        img.src = thumb;
+        img.alt = item.title || 'Video thumbnail';
+        img.loading = 'lazy';
+        modalMedia.appendChild(img);
+      }
+      if (item.url) {
         const link = document.createElement('a');
-        link.href = embeddedSrc;
+        link.href = item.url;
         link.target = '_blank';
         link.rel = 'noopener';
         link.textContent = 'Open video in new tab';
-        link.className = 'modal-video-link';
         link.style.display = 'inline-block';
         link.style.marginTop = '0.75rem';
         modalMedia.appendChild(link);
+      } else {
+        modalMedia.textContent = 'Video not available.';
       }
-    } else {
-      modalMedia.textContent = 'Video not available.';
     }
   } else {
     modalMedia.textContent = 'Media not available.';
