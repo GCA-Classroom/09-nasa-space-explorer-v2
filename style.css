@@ -7,7 +7,7 @@
 
 /* Base page styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   background-color: #f1f1f1;
   padding: 20px;
 }
@@ -29,7 +29,6 @@ body {
 }
 
 h1 {
-  font-family: Verdana, sans-serif;
   font-weight: bold;
   color: #212121;
 }
@@ -53,7 +52,7 @@ h1 {
 /* Inputs and buttons */
 input[type="date"],
 button {
-  font-family: Arial, sans-serif;
+  font-family: inherit;
   font-weight: normal;
   color: #666;
   padding: 10px 15px;
@@ -141,4 +140,115 @@ button:hover {
 .placeholder-icon {
   font-size: 48px;
   margin-bottom: 20px;
+}
+
+/* Loading state */
+.loading {
+  flex: 1 1 100%;
+  text-align: center;
+  padding: 40px;
+  color: #444;
+}
+.loading-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  display: inline-block;
+  transform-origin: center;
+  animation: spin 1.6s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Cards wrapper created by script.js */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(16,24,40,0.08);
+  overflow: hidden;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+  transition: transform 300ms ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(16,24,40,0.12);
+}
+
+.card:hover img {
+  transform: scale(1.06);
+}
+
+/* Only apply hover-zoom on devices that support hover; also apply on keyboard focus */
+@media (hover: hover) {
+  .card:hover img,
+  .card:focus img {
+    transform: scale(1.06);
+  }
+}
+
+/* Ensure keyboard focus shows zoom as well */
+.card:focus img {
+  transform: scale(1.06);
+}
+
+.card figcaption {
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+.card .meta {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.card .explain {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #444;
+  max-height: 72px;
+  overflow: hidden;
+}
+
+/* Expanded state shows the full explanation */
+.card.expanded .explain {
+  max-height: 2000px; /* large value to allow full text */
+}
+
+/* Make the whole card feel clickable and accessible */
+.card {
+  cursor: pointer;
+}
+
+.card:focus {
+  outline: 3px solid rgba(21,156,228,0.25);
+  outline-offset: 4px;
+}
+
+@media (max-width: 480px) {
+  .card { width: 100%; }
+  .card img { height: 160px; }
 }
